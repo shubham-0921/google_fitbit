@@ -1,6 +1,8 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { FullscreenButton } from "./FullscreenButton";
+import { SyncButton } from "./SyncButton";
 
 export function Nav({ initials, email }: { initials: string; email?: string }) {
   const path = usePathname();
@@ -20,7 +22,8 @@ export function Nav({ initials, email }: { initials: string; email?: string }) {
       {tab("/running", "Running")}
       {tab("/sleep", "Sleep")}
       <div className="nav-right">
-        <span className="text-muted" style={{ fontSize: 13 }}>{email ?? "Google Health"}</span>
+        <SyncButton />
+        <FullscreenButton />
         <div className="avatar" title={email}>{initials}</div>
         <a className="pill" href="/api/auth/logout" style={{ minHeight: 32, padding: "0 12px", fontSize: 12 }}>
           Sign out
