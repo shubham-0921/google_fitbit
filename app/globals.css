@@ -41,6 +41,18 @@ button { font-family: inherit; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--color-accent-100); color: var(--color-accent-800); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono), monospace; font-weight: 700; font-size: 12px; flex: none; }
 
+/* Page scrolls inside a fixed container whose direction is flipped (rtl) so the scrollbar sits on the LEFT. */
+.scroller { position: fixed; inset: 0; overflow-x: hidden; overflow-y: scroll; direction: rtl; }
+.scroller-inner { direction: ltr; min-height: 100%; }
+.scroller::-webkit-scrollbar { width: 26px; }
+.scroller::-webkit-scrollbar-track { background: var(--color-neutral-200); border-right: 3px solid var(--color-text); }
+.scroller::-webkit-scrollbar-thumb { background: var(--color-accent); border: 3px solid var(--color-text); border-radius: 999px; min-height: 64px; }
+.scroller::-webkit-scrollbar-thumb:hover { background: var(--color-accent-600); }
+.scroller::-webkit-scrollbar-thumb:active { background: var(--color-accent-800); }
+@supports not selector(::-webkit-scrollbar) {
+  .scroller { scrollbar-width: auto; scrollbar-color: var(--color-accent) var(--color-neutral-200); }
+}
+
 main { max-width: 1160px; margin: 0 auto; padding: var(--space-8) var(--space-6); }
 .section { display: flex; flex-direction: column; gap: var(--space-6); }
 .head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); }
@@ -100,6 +112,7 @@ main { max-width: 1160px; margin: 0 auto; padding: var(--space-8) var(--space-6)
 .goal-due .goal-kicker, .goal-overdue .goal-kicker { color: inherit; opacity: .8; }
 
 @media (max-width: 720px) {
+  .scroller::-webkit-scrollbar { width: 16px; }
   .goal { grid-template-columns: 1fr; padding: var(--space-4); }
   .goal-headline { font-size: 20px; }
   .nav { gap: 12px; padding: var(--space-3) var(--space-4); }

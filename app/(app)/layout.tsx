@@ -8,9 +8,11 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   const initials = (session.name ?? session.email ?? "ME")
     .split(/[\s@.]+/).filter(Boolean).slice(0, 2).map((s) => s[0]!.toUpperCase()).join("");
   return (
-    <div>
-      <Nav initials={initials} email={session.email} />
-      <main>{children}</main>
+    <div className="scroller">
+      <div className="scroller-inner">
+        <Nav initials={initials} email={session.email} />
+        <main>{children}</main>
+      </div>
     </div>
   );
 }
