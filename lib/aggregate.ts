@@ -162,3 +162,79 @@ export function sleepView(nights: Night[], range: Range) {
     })),
   };
 }
+
+// ---------- "run every other day" goal ----------
+export type GoalStatus = "done" | "rest" | "due" | "overdue";
+/** Goal: a run at least every 2nd day, i.e. at most one rest day between runs. */
+const GOAL_GAP_DAYS = 2;
+
+const MOTIVATION: Record<GoalStatus, string[]> = {
+  done: [
+    "Run banked. Rest up — consistency beats intensity.",
+    "That’s one in the books. Recover well, your legs earned it.",
+    "Every other day is the whole plan, and today is checked off.",
+  ],
+  rest: [
+    "Rest is part of the plan. Hydrate, stretch, and lay out your shoes tonight.",
+    "Legs recover today, get stronger tomorrow. Early night = easy morning run.",
+    "Tomorrow’s run starts with tonight’s early bedtime.",
+  ],
+  due: [
+    "Today’s the day. The hardest part is the front door — go.",
+    "You don’t have to be fast, just show up. Every other day is the deal.",
+    "Future you is already glad you went. Shoes on.",
+  ],
+  overdue: [
+    "Missed days happen — the habit doesn’t have to end. A short easy run counts. Go now.",
+    "Don’t aim for perfect, aim for today. Even 15 minutes beats zero.",
+    "What matters is the next run, and the next run is today.",
+  ],
+};
+
+const HEADLINE: Record<GoalStatus, string> = {
+  done: "Nice work!",
+  rest: "Rest day",
+  due: "Run day!",
+  overdue: "Time to lace up",
+};
+
+export function goalView(runs: Run[]) {
+  const today = localToday(runs[0]?.offsetSec);
+  const days = [...new Set(runs.map((r) => keyToDays(r.day)))].sort((a, b) => b - a);
+  const daysAgo = days.length ? today - days[0] : null;
+
+  const status: GoalStatus =
+    daysAgo === null || daysAgo > GOAL_GAP_DAYS
+      ? "overdue"
+      : daysAgo === GOAL_GAP_DAYS
+        ? "due"
+        : daysAgo === 0
+          ? "done"
+          : "rest";
+
+  // Consecutive runs, each within the goal gap of the previous one; broken if currently overdue.
+  let streak = 0;
+  if (days.length && status !== "overdue") {
+    streak = 1;
+    for (let i = 1; i < days.length && days[i - 1] - days[i] <= GOAL_GAP_DAYS; i++) streak++;
+  }
+
+  const nextIn = daysAgo === null ? 0 : GOAL_GAP_DAYS - daysAgo;
+  const dots = Array.from({ length: 14 }, (_, i) => {
+    const d = today - 13 + i;
+    return { on: days.includes(d), today: d === today };
+  });
+  const messages = MOTIVATION[status];
+
+  return {
+    status,
+    headline: HEADLINE[status],
+    lastRun:
+      daysAgo === null ? "No run in the last 30 days" : daysAgo === 0 ? "Your last run was today" : `Your last run was ${daysAgo} day${daysAgo === 1 ? "" : "s"} ago`,
+    message: messages[today % messages.length],
+    next: nextIn <= 0 ? "Today" : nextIn === 1 ? "Tomorrow" : `In ${nextIn} days`,
+    streak,
+    runsLast14: dots.filter((d) => d.on).length,
+    dots,
+  };
+}

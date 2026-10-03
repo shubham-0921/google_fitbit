@@ -1,5 +1,5 @@
-import { BarChart, Notice, StatCards, Toggle } from "@/components/Bits";
-import { runView, type Range, type Units } from "@/lib/aggregate";
+import { BarChart, GoalBanner, Notice, StatCards, Toggle } from "@/components/Bits";
+import { goalView, runView, type Range, type Units } from "@/lib/aggregate";
 import { loadRuns } from "@/lib/health";
 import { loadForUser } from "@/lib/load";
 
@@ -37,13 +37,14 @@ export default async function Running({ searchParams }: PageProps<"/running">) {
   if ("error" in res)
     return <section className="section">{header("Running")}<Notice err>{res.error}</Notice></section>;
   if (!res.data.length)
-    return <section className="section">{header("No runs yet")}<Notice>No runs found in the last 30 days of your Google Health data.</Notice></section>;
+    return <section className="section">{header("No runs yet")}<GoalBanner goal={goalView([])} /><Notice>No runs found in the last 30 days of your Google Health data.</Notice></section>;
 
   const v = runView(res.data, range, units);
   const last = v.last!;
   return (
     <section className="section">
       {header(last.when)}
+      <GoalBanner goal={goalView(res.data)} />
       <div className="card elev-sm hero-run">
         <div className="full">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>

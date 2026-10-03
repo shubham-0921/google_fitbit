@@ -60,3 +60,28 @@ export function BarChart({
 export function Notice({ children, err }: { children: ReactNode; err?: boolean }) {
   return <div className={`notice${err ? " err" : ""}`}>{children}</div>;
 }
+
+export function GoalBanner({ goal }: { goal: ReturnType<typeof import("@/lib/aggregate").goalView> }) {
+  return (
+    <div className={`card elev-sm goal goal-${goal.status}`}>
+      <div className="goal-main">
+        <div className="card-kicker goal-kicker">GOAL · RUN EVERY OTHER DAY</div>
+        <h4 className="goal-headline">{goal.headline}</h4>
+        <div className="goal-last">{goal.lastRun}</div>
+        <p className="goal-msg">{goal.message}</p>
+      </div>
+      <div className="goal-side">
+        <div className="goal-chips">
+          <div><div className="goal-chip-val mono">{goal.next}</div><div className="goal-chip-label">Next run</div></div>
+          <div><div className="goal-chip-val mono">{goal.streak}</div><div className="goal-chip-label">On-goal streak</div></div>
+          <div><div className="goal-chip-val mono">{goal.runsLast14}<small>/7</small></div><div className="goal-chip-label">Runs, last 14 days</div></div>
+        </div>
+        <div className="goal-dots" aria-label="Runs over the last 14 days">
+          {goal.dots.map((d, i) => (
+            <span key={i} className={`goal-dot${d.on ? " on" : ""}${d.today ? " today" : ""}`} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
