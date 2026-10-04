@@ -2,18 +2,23 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
-// When framed by Pi Tiles (http://localhost:8080), tell it what is going on.
+// When framed by Pi Tiles, tell it what is going on.
 // The login page lives at "/", so being there means the user is signed out. Google
 // refuses to render its sign-in inside a frame, so Pi Tiles offers "Open in browser".
-const PI_TILES_ORIGIN = "http://localhost:8080";
+// Local dev server and the Vercel deployment. postMessage drops a message whose targetOrigin
+// doesn't match the parent, so sending to each allowed origin only ever reaches the real one.
+const PI_TILES_ORIGINS = ["http://localhost:8080", "https://pitiles.vercel.app"];
 
 export function EmbedBridge() {
   const path = usePathname();
 
   useEffect(() => {
     if (window.parent === window) return;
-    const send = (type: string) =>
-      window.parent.postMessage({ source: "pi-tiles", type }, PI_TILES_ORIGIN);
+    const send = (type: string) => {
+      for (const origin of PI_TILES_ORIGINS) {
+        window.parent.postMessage({ source: "pi-tiles", type }, origin);
+      }
+    };
 
     send(path === "/" ? "auth-required" : "ready");
 
