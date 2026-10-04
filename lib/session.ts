@@ -41,10 +41,13 @@ export async function getSession(): Promise<Session | null> {
   }
 }
 
+// SameSite=None so the cookie is sent when Trace is framed by Pi Tiles on http://localhost
+// (a cross-site context). Browsers require Secure with None, so dev over http keeps Lax.
+const prod = process.env.NODE_ENV === "production";
 export const sessionCookieOptions = {
   httpOnly: true,
-  sameSite: "lax" as const,
-  secure: process.env.NODE_ENV === "production",
+  sameSite: (prod ? "none" : "lax") as "none" | "lax",
+  secure: prod,
   path: "/",
   maxAge: MAX_AGE,
 };
